@@ -2,7 +2,11 @@ name: Build app
 
 on:
   workflow_dispatch:
-
+  
+permissions:
+  contents: write
+  discussions: write
+  
 jobs:
   build:
 
@@ -42,3 +46,12 @@ jobs:
       with:
         name: app-release
         path: "app/build/outputs/apk/release/out/*"
+    - name: GetTime
+      id: get_time
+      run: |
+          echo "TIME=$(TZ=UTC date +%s )" >> $GITHUB_OUTPUT
+    - name: Release
+      uses: softprops/action-gh-release@v2
+      with:
+          files: app/build/outputs/apk/release/out/app-release.apk
+          tag_name: ${{ steps.get_time.outputs.TIME }}
